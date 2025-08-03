@@ -98,10 +98,6 @@ namespace NoteTweaks.Managers
                     {
                         value = Config.EnableFog ? value : 999999f;
                     }
-                    if (keyword.Key == "FogHeightOffset")
-                    {
-                        value = Config.EnableHeightFog ? value : 999999f;
-                    }
                     
                     ReplacementDotMaterial.SetFloat(keyword.Value, value);
                     ReplacementArrowMaterial.SetFloat(keyword.Value, value);
@@ -295,6 +291,11 @@ namespace NoteTweaks.Managers
                 name = "NoteTweaks_NoteMaterial",
                 renderQueue = 1995
             };
+
+            if (!Config.EnableHeightFog)
+            {
+                NoteMaterial.DisableKeyword("HEIGHT_FOG");
+            }
             
             await Textures.LoadNoteTexture(Config.NoteTexture);
         }
@@ -332,6 +333,11 @@ namespace NoteTweaks.Managers
             {
                 name = "NoteTweaks_BombMaterial"
             };
+            
+            if (!Config.EnableHeightFog)
+            {
+                NoteMaterial.DisableKeyword("HEIGHT_FOG");
+            }
             
             await Textures.LoadNoteTexture(Config.BombTexture, true);
         }

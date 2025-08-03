@@ -1001,7 +1001,17 @@ namespace NoteTweaks.UI
             set
             {
                 Config.EnableHeightFog = value;
-                Materials.UpdateFogValues("FogHeightOffset");
+
+                if (value)
+                {
+                    Materials.BombMaterial?.EnableKeyword("HEIGHT_FOG");
+                    Materials.NoteMaterial?.EnableKeyword("HEIGHT_FOG");
+                }
+                else
+                {
+                    Materials.BombMaterial?.DisableKeyword("HEIGHT_FOG");
+                    Materials.NoteMaterial?.DisableKeyword("HEIGHT_FOG");
+                }
             }
         }
         
