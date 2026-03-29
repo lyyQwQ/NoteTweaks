@@ -1,2 +1,8 @@
 # Local Visual Studio / MSBuild user settings
 *.csproj.user
+
+# Local task files and build artifacts
+.tasks/
+NoteTweaks/bin/
+NoteTweaks/obj/
+tmp/

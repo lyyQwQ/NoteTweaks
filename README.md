@@ -2,7 +2,7 @@
 This is a Beat Saber mod that lets you tweak various aspects of the default note.
 
 > [!NOTE]
-> **This is currently actively maintained for Beat Saber versions 1.39.1 and 1.40.6.** Other versions of the game *may* work, these are the ones I test.
+> **This is currently actively maintained for Beat Saber versions 1.40.8 and 1.42.3.** Other versions of the game *may* work, these are the ones I test.
 
 ## Downloads
 See the [releases page](https://github.com/TheBlackParrot/NoteTweaks/releases) for mod downloads. *Pre-release* builds are subject to change, it is highly recommended to use the latest *Release* build. You will not be notified of Pre-release -> Release updates, unless the version numbers differ.
@@ -36,6 +36,43 @@ I've provided [36 cubemap textures](https://github.com/TheBlackParrot/NoteTweaks
 
 ## Developers
 This project utilizes [LunaBSMod.Tasks](https://github.com/Aeroluna/LunaBSMod.Tasks) from [Aeroluna](https://github.com/Aeroluna) to better manage code for different versions of the game. You will need to compile this and install it as a local NuGet package.
+
+### Multi-version builds
+The project currently supports these configurations:
+
+- `Debug-1.40.8`
+- `Release-1.40.8`
+- `Debug-1.42.3`
+- `Release-1.42.3`
+
+Create a local `NoteTweaks.csproj.user` file that points at the Beat Saber install root for the active `$(GameVersion)`. For example:
+
+```xml
+<Project>
+  <PropertyGroup>
+    <ReferencePath>C:/Users/USERNAME/BSManager/BSInstances/$(GameVersion)/Beat Saber_Data/Managed;C:/Users/USERNAME/BSManager/BSInstances/$(GameVersion)/Libs;C:/Users/USERNAME/BSManager/BSInstances/$(GameVersion)/Plugins</ReferencePath>
+    <BeatSaberDir>C:/Users/USERNAME/BSManager/BSInstances/$(GameVersion)</BeatSaberDir>
+  </PropertyGroup>
+</Project>
+```
+
+`*.csproj.user` is ignored by Git so each machine can keep its own local game path.
+
+Typical build commands:
+
+```powershell
+dotnet restore NoteTweaks/NoteTweaks.csproj -p:Configuration=Release-1.40.8
+dotnet restore NoteTweaks/NoteTweaks.csproj -p:Configuration=Release-1.42.3
+
+dotnet build NoteTweaks/NoteTweaks.csproj -c Release-1.40.8
+dotnet build NoteTweaks/NoteTweaks.csproj -c Release-1.42.3
+```
+
+If a local verification build should stay out of the game directory, add:
+
+```powershell
+/p:DisableCopyToGame=True /p:DisableCopyToPlugins=True
+```
 
 ## Dependencies
 - BSIPA
