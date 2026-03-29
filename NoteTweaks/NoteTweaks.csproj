@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <ProductVersion>8.0.30703</ProductVersion>
         <ProjectGuid>{5470ACDB-CE6B-4791-8F32-3F5E5CB70FFD}</ProjectGuid>
@@ -12,7 +12,7 @@
         <Product>NoteTweaks</Product>
         <Copyright>Copyright © TheBlackParrot</Copyright>
         <BSMTProjectType>BSIPA</BSMTProjectType>
-        <Configurations>Debug-1.39.1;Release-1.39.1;Release-1.40.6;Debug-1.40.6</Configurations>
+        <Configurations>Debug-1.40.8;Release-1.40.8;Debug-1.42.3;Release-1.42.3</Configurations>
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
     <PropertyGroup>

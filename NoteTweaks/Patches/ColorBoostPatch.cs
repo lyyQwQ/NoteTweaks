@@ -1,4 +1,6 @@
-﻿using HarmonyLib;
+using System.Linq;
+using System.Reflection;
+using HarmonyLib;
 using NoteTweaks.Configuration;
 using NoteTweaks.Utils;
 using UnityEngine;
@@ -59,48 +61,73 @@ namespace NoteTweaks.Patches
             return PatchedScheme;
         }
         
-        [HarmonyPatch(typeof(StandardLevelScenesTransitionSetupDataSO), "InitColorInfo")]
-        [HarmonyPriority(Priority.LowerThanNormal)]
-        [HarmonyPostfix]
-        // ReSharper disable once InconsistentNaming
-        private static void InitColorInfoPatch(StandardLevelScenesTransitionSetupDataSO __instance)
+        private static void ApplyPatchedColors(StandardLevelScenesTransitionSetupDataSO setupData)
         {
             if (!Config.Enabled || NotePhysicalTweaks.AutoDisable)
             {
                 return;
             }
 
-            PrePatchedScheme = __instance.colorScheme;
+            PrePatchedScheme = setupData.colorScheme;
             
             ColorSchemeSO schemeObj = ScriptableObject.CreateInstance<ColorSchemeSO>();
-            schemeObj._colorScheme = __instance.colorScheme;
+            schemeObj._colorScheme = setupData.colorScheme;
 
             ColorScheme patchedColors = PatchColors(schemeObj);
 
-            __instance.usingOverrideColorScheme = true;
-            __instance.colorScheme = patchedColors;
+            setupData.usingOverrideColorScheme = true;
+            setupData.colorScheme = patchedColors;
         }
         
-        [HarmonyPatch(typeof(MultiplayerLevelScenesTransitionSetupDataSO), "InitColorInfo")]
-        [HarmonyPriority(Priority.LowerThanNormal)]
-        [HarmonyPostfix]
-        // ReSharper disable once InconsistentNaming
-        private static void InitColorInfoPatchMultiplayer(MultiplayerLevelScenesTransitionSetupDataSO __instance)
+        private static void ApplyPatchedColors(MultiplayerLevelScenesTransitionSetupDataSO setupData)
         {
             if (!Config.Enabled || NotePhysicalTweaks.AutoDisable)
             {
                 return;
             }
             
-            PrePatchedScheme = __instance.colorScheme;
+            PrePatchedScheme = setupData.colorScheme;
             
             ColorSchemeSO schemeObj = ScriptableObject.CreateInstance<ColorSchemeSO>();
-            schemeObj._colorScheme = __instance.colorScheme;
+            schemeObj._colorScheme = setupData.colorScheme;
 
             ColorScheme patchedColors = PatchColors(schemeObj);
 
-            __instance.usingOverrideColorScheme = true;
-            __instance.colorScheme = patchedColors;
+            setupData.usingOverrideColorScheme = true;
+            setupData.colorScheme = patchedColors;
+        }
+
+        [HarmonyPatch]
+        [HarmonyPriority(Priority.LowerThanNormal)]
+        private static class StandardLevelScenesTransitionSetupDataColorPatch
+        {
+            private static MethodInfo TargetMethod() => AccessTools.FirstMethod(
+                typeof(StandardLevelScenesTransitionSetupDataSO),
+                m => m.Name == nameof(StandardLevelScenesTransitionSetupDataSO.Init) &&
+#if V1_40_8
+                     m.GetParameters().All(p => p.ParameterType != typeof(IBeatmapLevelData)));
+#else
+                     m.GetParameters().Any(p => p.ParameterType == typeof(IBeatmapLevelData)));
+#endif
+
+            [HarmonyPostfix]
+            // ReSharper disable once InconsistentNaming
+            private static void Postfix(StandardLevelScenesTransitionSetupDataSO __instance)
+            {
+                ApplyPatchedColors(__instance);
+            }
+        }
+
+        [HarmonyPatch(typeof(MultiplayerLevelScenesTransitionSetupDataSO), "Init")]
+        [HarmonyPriority(Priority.LowerThanNormal)]
+        private static class MultiplayerLevelScenesTransitionSetupDataColorPatch
+        {
+            [HarmonyPostfix]
+            // ReSharper disable once InconsistentNaming
+            private static void Postfix(MultiplayerLevelScenesTransitionSetupDataSO __instance)
+            {
+                ApplyPatchedColors(__instance);
+            }
         }
 
         [HarmonyPatch(typeof(StandardLevelRestartController), "RestartLevel")]

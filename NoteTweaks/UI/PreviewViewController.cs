@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -23,6 +23,8 @@ namespace NoteTweaks.UI
         private static PluginConfig Config => PluginConfig.Instance;
         
         internal static GameObject NoteContainer = new GameObject("_NoteTweaks_NoteContainer");
+        private const string GameCoreSceneName = "GameCore";
+        private const string StandardGameplaySceneName = "StandardGameplay";
 
         private const float NOTE_SIZE = 0.5f;
         private static Vector3 _initialPosition = new Vector3(0f, 0.67f, 4.5f);
@@ -1281,19 +1283,14 @@ namespace NoteTweaks.UI
             }
             
             NoteContainer.transform.position = _initialPosition;
-            
-            // ReSharper disable PossibleNullReferenceException
-            MenuTransitionsHelper menuTransitionsHelper = Resources.FindObjectsOfTypeAll<MenuTransitionsHelper>().FirstOrDefault();
-            StandardLevelScenesTransitionSetupDataSO standardLevelScenesTransitionSetupData = menuTransitionsHelper._standardLevelScenesTransitionSetupData;
-            SceneInfo gameCoreSceneInfo = standardLevelScenesTransitionSetupData._gameCoreSceneInfo;
-            SceneInfo standardGameplaySceneInfo = standardLevelScenesTransitionSetupData._standardGameplaySceneInfo;
-            
-            UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(gameCoreSceneInfo.sceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive).completed +=
+
+            UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(GameCoreSceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive).completed +=
                 operation1 =>
                 {
-                    UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(standardGameplaySceneInfo.sceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive).completed +=
+                    UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(StandardGameplaySceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive).completed +=
                         async operation2 =>
                         {
+                            // ReSharper disable PossibleNullReferenceException
                             BeatmapObjectsInstaller beatmapObjectsInstaller = Resources.FindObjectsOfTypeAll<BeatmapObjectsInstaller>().FirstOrDefault();
                             
                             GameNoteController notePrefab = beatmapObjectsInstaller._normalBasicNotePrefab;
@@ -1352,9 +1349,9 @@ namespace NoteTweaks.UI
                             HasInitialized = true;
 
                             await CutoutFadeIn();
-                            
-                            UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(standardGameplaySceneInfo.sceneName);
-                            UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(gameCoreSceneInfo.sceneName);
+
+                            _ = UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(StandardGameplaySceneName);
+                            _ = UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(GameCoreSceneName);
                         };
                 };
         }

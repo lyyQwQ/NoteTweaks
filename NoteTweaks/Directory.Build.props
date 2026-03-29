@@ -1,25 +1,25 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!-- This file contains project properties used by the build. -->
 <Project>
   <!-- Game version-dependent stuff -->
-  <PropertyGroup Condition="$(Configuration) == 'Release-1.39.1' Or $(Configuration) == 'Debug-1.39.1'">
-    <GameVersion>1.39.1</GameVersion>
-
-    <BSIPAVersion>4.3.5</BSIPAVersion>
-    <BSMLVersion>1.12.4</BSMLVersion>
-    <SiraUtilVersion>3.1.14</SiraUtilVersion>
-    <SongCoreVersion>3.14.15</SongCoreVersion>
-
-    <PresetsFolder>LATEST</PresetsFolder>
-    <BSMLFolder>LATEST</BSMLFolder>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(Configuration) == 'Release-1.40.6' Or $(Configuration) == 'Debug-1.40.6'">
-    <GameVersion>1.40.6</GameVersion>
+  <PropertyGroup Condition="$(Configuration) == 'Release-1.40.8' Or $(Configuration) == 'Debug-1.40.8'">
+    <GameVersion>1.40.8</GameVersion>
 
     <BSIPAVersion>4.3.6</BSIPAVersion>
     <BSMLVersion>1.12.5</BSMLVersion>
     <SiraUtilVersion>3.2.1</SiraUtilVersion>
     <SongCoreVersion>3.15.3</SongCoreVersion>
+
+    <PresetsFolder>LATEST</PresetsFolder>
+    <BSMLFolder>LATEST</BSMLFolder>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(Configuration) == 'Release-1.42.3' Or $(Configuration) == 'Debug-1.42.3'">
+    <GameVersion>1.42.3</GameVersion>
+
+    <BSIPAVersion>4.3.6</BSIPAVersion>
+    <BSMLVersion>1.14.1</BSMLVersion>
+    <SiraUtilVersion>3.3.1</SiraUtilVersion>
+    <SongCoreVersion>3.16.0</SongCoreVersion>
 
     <PresetsFolder>LATEST</PresetsFolder>
     <BSMLFolder>LATEST</BSMLFolder>

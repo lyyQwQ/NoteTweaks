@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -68,19 +68,11 @@ namespace NoteTweaks.Patches
         private static bool _fixDots = true;
         internal static bool UsesChroma;
 
-#if V1_40_6
         private static bool MapHasRequirement(BeatmapKey beatmapKey, string requirement, bool alsoCheckSuggestions = false)
-#else
-        private static bool MapHasRequirement(BeatmapLevel beatmapLevel, BeatmapKey beatmapKey, string requirement, bool alsoCheckSuggestions = false)
-#endif
         {
             bool hasRequirement = false;
             
-#if V1_40_6
             SongData.DifficultyData diffData = GetCustomLevelSongDifficultyData(beatmapKey);
-#else
-            ExtraSongData.DifficultyData diffData = RetrieveDifficultyData(beatmapLevel, beatmapKey);
-#endif
             if (diffData != null)
             {
                 hasRequirement = diffData.additionalDifficultyData._requirements.Any(x => x == requirement);
@@ -114,11 +106,7 @@ namespace NoteTweaks.Patches
                 return true;
             }
 
-#if V1_40_6
             private static void PostfixCall(BeatmapKey beatmapKey, in GameplayModifiers gameplayModifiers)
-#else
-            private static void PostfixCall(BeatmapLevel beatmapLevel, BeatmapKey beatmapKey, in GameplayModifiers gameplayModifiers)
-#endif
             {
                 if (!Config.Enabled)
                 {
@@ -126,7 +114,6 @@ namespace NoteTweaks.Patches
                     return;
                 }
 
-#if V1_40_6
                 AutoDisable =
                     (MapHasRequirement(beatmapKey, "Noodle Extensions") &&
                      Config.DisableIfNoodle) ||
@@ -141,22 +128,6 @@ namespace NoteTweaks.Patches
                 {
                     _fixDots = Config.FixDotsIfNoodle;
                 }
-#else
-                AutoDisable =
-                    (MapHasRequirement(beatmapLevel, beatmapKey, "Noodle Extensions") &&
-                     Config.DisableIfNoodle) ||
-                    (MapHasRequirement(beatmapLevel, beatmapKey, "Vivify") &&
-                     Config.DisableIfVivify);
-
-                UsesChroma = PluginManager.GetPluginFromId("Chroma") != null &&
-                             MapHasRequirement(beatmapLevel, beatmapKey, "Chroma", true);
-
-                _fixDots = true;
-                if (MapHasRequirement(beatmapLevel, beatmapKey, "Noodle Extensions"))
-                {
-                    _fixDots = Config.FixDotsIfNoodle;
-                }
-#endif
 
                 _gameplayModifiers = gameplayModifiers;
                 _fixDots = (_fixDots && !gameplayModifiers.ghostNotes);
@@ -172,16 +143,16 @@ namespace NoteTweaks.Patches
                 private static MethodInfo TargetMethod() => AccessTools.FirstMethod(
                     typeof(StandardLevelScenesTransitionSetupDataSO),
                     m => m.Name == nameof(StandardLevelScenesTransitionSetupDataSO.Init) &&
+#if V1_40_8
                          m.GetParameters().All(p => p.ParameterType != typeof(IBeatmapLevelData)));
+#else
+                         m.GetParameters().Any(p => p.ParameterType == typeof(IBeatmapLevelData)));
+#endif
 
                 // ReSharper disable once InconsistentNaming
                 internal static void Postfix(StandardLevelScenesTransitionSetupDataSO __instance, in GameplayModifiers gameplayModifiers)
                 {
-#if V1_40_6
                     PostfixCall(__instance.beatmapKey, gameplayModifiers);
-#else
-                    PostfixCall(__instance.beatmapLevel, __instance.beatmapKey, gameplayModifiers);
-#endif
                 }
 
                 // ReSharper disable once InconsistentNaming
@@ -199,11 +170,7 @@ namespace NoteTweaks.Patches
                 // ReSharper disable once InconsistentNaming
                 internal static void Postfix(MultiplayerLevelScenesTransitionSetupDataSO __instance, in GameplayModifiers gameplayModifiers)
                 {
-#if V1_40_6
                     PostfixCall(__instance.beatmapKey, gameplayModifiers);
-#else
-                    PostfixCall(__instance.beatmapLevel, __instance.beatmapKey, gameplayModifiers);
-#endif
                 }
 
                 [HarmonyPatch(typeof(MultiplayerLevelScenesTransitionSetupDataSO), "Init")]
@@ -1093,6 +1060,10 @@ namespace NoteTweaks.Patches
             ColorType colorType = noteController._noteData.colorType;
             Color originalColor = colorNoteVisuals._colorManager.ColorForType(colorType);
             bool isLeft = colorType == ColorType.ColorA;
+            if (NoteColorTweaks.PatchedScheme == null)
+            {
+                return true;
+            }
 
             if (originalColor == (isLeft ? NoteColorTweaks.PatchedScheme._saberAColor : NoteColorTweaks.PatchedScheme._saberBColor))
             {
